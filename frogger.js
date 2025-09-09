@@ -242,8 +242,6 @@ function update(dt){
         showGameOver();
       }
     } else if (Math.abs(frog.y - bottomSideY) < 0.02 && !frog.dirUp && score>0) {
-      score++;
-      ticks++;
       updateHUD();
       frog.dirUp = true;
       frog.x = 0;
@@ -331,3 +329,4 @@ function drawTriangle(cx, cy, sx, sy, rot, color){
   gl.uniformMatrix3fv(uTransformLoc, false, m);
   gl.drawArrays(gl.TRIANGLES, 0, 3);
 }
+
