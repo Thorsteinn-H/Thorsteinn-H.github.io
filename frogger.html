@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Fríða Frogger (WebGL)</title>
+<style>
+  body { font-family: sans-serif; display:flex; flex-direction:column; align-items:center; margin:20px; }
+  #gl-canvas { border: 2px solid #333; }
+  #hud { margin-top:10px; text-align:center; }
+  #score { font-size:18px; font-weight:600; }
+  #ticks { margin-top:6px; height:20px; }
+</style>
+</head>
+
+<body>
+<canvas id="gl-canvas" width="512" height="512" oncontextmenu="return false;"></canvas>
+
+<div id="hud">
+  <div id="score">Stig: 0</div>
+  <div id="ticks"></div>
+  <div style="margin-top:6px; font-size:13px; color:#666;">
+    Notaðu örvarnar (↑ ↓ ← →) til að stýra Fríðu. Leikur endar þegar 10 stig/strik eru náð.
+  </div>
+</div>
+
+<script id="vertex-shader" type="x-shader/x-vertex">
+attribute vec2 vPosition;
+uniform mat3 uTransform;
+
+void main() {
+    vec3 pos = uTransform * vec3(vPosition, 1.0);
+    gl_Position = vec4(pos.xy, 0.0, 1.0);
+}
+</script>
+
+<script id="fragment-shader" type="x-shader/x-fragment">
+precision mediump float;
+uniform vec4 uColor;
+void main() {
+    gl_FragColor = uColor;
+}
+</script>
+
+<script type="text/javascript" src="webgl-utils.js"></script>
+<script type="text/javascript" src="initShaders.js"></script>
+<script type="text/javascript" src="MV.js"></script>
+<script type="text/javascript" src="frogger.js"></script>
+</body>
+</html>
