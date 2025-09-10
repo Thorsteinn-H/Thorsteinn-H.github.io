@@ -233,7 +233,7 @@ function update(dt){
       score++;
       ticks++;
       updateHUD();
-      frog.dirUp = false; 
+      frog.dirUp = true; 
   
       frog.x = 0;
       frog.y = -1 + SIDEWALK_HEIGHT / 2;
@@ -320,5 +320,6 @@ function drawTriangle(cx, cy, sx, sy, rot, color){
   gl.uniformMatrix3fv(uTransformLoc, false, m);
   gl.drawArrays(gl.TRIANGLES, 0, 3);
 }
+
 
 
