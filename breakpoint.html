@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+
+<script id="vertex-shader" type="x-shader/x-vertex">
+
+uniform vec2 boxPos;
+attribute vec4 vPosition;
+
+
+void main()
+{
+
+    vec4 t = vPosition;
+    
+    t.xy += boxPos;
+    
+    gl_Position = t;
+
+}
+</script>
+
+<script id="fragment-shader" type="x-shader/x-fragment">
+
+precision mediump float;
+varying vec4 fColor;
+
+void main()
+{
+    gl_FragColor = vec4( 1.0, 0.0, 0.0, 1.0 );
+}
+</script>
+
+<script type="text/javascript" src="webgl-utils.js"></script>
+<script type="text/javascript" src="initShaders.js"></script>
+<script type="text/javascript" src="MV.js"></script>
+<script type="text/javascript" src="breakpoint.js"></script>
+
+<body>
+<canvas id="gl-canvas" width="1000" height="600"></canvas>
+</body>
+</html>

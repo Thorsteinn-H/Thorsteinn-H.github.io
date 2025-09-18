@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
+<title>Rignandi punktar</title>
+
+<script id="vertex-shader" type="x-shader/x-vertex">
+uniform float time;
+attribute vec4 vPosition;
+varying float yPos;   
+varying float xPos;
+
+void main()
+{
+    gl_PointSize = 3.0;
+    vec4 tpos = vPosition;
+
+    tpos.y = 1.0 - mod(0.001*time + tpos.y + 1.0, 2.0);
+
+    gl_Position = tpos;
+
+    yPos = tpos.y;
+    xPos = tpos.x;
+}
+</script>
+
+<script id="fragment-shader" type="x-shader/x-fragment">
+precision mediump float;
+varying float yPos;
+varying float xPos;
+
+void main()
+{
+    vec4 color;
+    /*
+    //Póland
+    if (yPos < 0.0){
+        color = vec4(1.0, 0.0, 0.0, 1.0);
+    }
+    */
+    /*
+    //Frakkland
+    if (xPos < -0.33){
+        color = vec4(0.0, 0.0, 1.0, 1.0);
+    }
+    if (xPos > 0.33){
+        color = vec4(1.0, 0.0, 0.0, 1.0);
+    }
+    */
+
+    //Ísland
+    vec4 blue = vec4(0.0078, 0.3216, 0.6118, 1.0);   // Blár
+    vec4 white = vec4(1.0, 1.0, 1.0, 1.0);           // Hvítur
+    vec4 red = vec4(0.8627, 0.1176, 0.2078, 1.0);    // Rauður  
+
+    //Lita allt sem blár því það er notað mest
+    color = blue;
+
+    //Færa frá miðju
+    float xShift = xPos + 0.4;  
+
+    // Hvítur kross
+    if (abs(xShift) < 0.2 || abs(yPos) < 0.2) {
+        color = white;
+    }
+
+    // Rauður kross
+    if (abs(xShift) < 0.15 || abs(yPos) < 0.15) {
+        color = red;
+    }
+
+    gl_FragColor = color;
+}
+</script>
+
+
+
+<script type="text/javascript" src="webgl-utils.js"></script>
+<script type="text/javascript" src="initShaders.js"></script>
+<script type="text/javascript" src="MV.js"></script>
+<script type="text/javascript" src="rainingPoints.js"></script>
+</head>
+
+<body>
+<canvas id="gl-canvas" width="750" height="540">
+</body>
+</html>
