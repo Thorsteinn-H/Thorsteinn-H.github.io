@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+
+<script id="vertex-shader" type="x-shader/x-vertex">
+
+attribute vec4 vPosition;
+attribute vec4 vNormal;
+varying vec3 N, L, E;
+uniform mat4 modelViewMatrix;
+uniform mat4 projectionMatrix;
+uniform vec4 lightPosition;
+uniform mat3 normalMatrix;
+
+void main()
+{
+    vec3 pos = (modelViewMatrix * vPosition).xyz;
+
+    // check for directional light
+    if(lightPosition.w == 0.0) L = normalize(lightPosition.xyz);
+    else L = normalize( lightPosition.xyz - pos );
+
+    E =  -normalize(pos);
+    N = normalize( normalMatrix*vNormal.xyz);
+
+    gl_Position = projectionMatrix * modelViewMatrix * vPosition;
+
+}
+</script>
+<script id="fragment-shader" type="x-shader/x-fragment">
+
+precision mediump float;
+
+uniform vec4 ambientProduct;
+uniform vec4 diffuseProduct;
+uniform vec4 specularProduct;
+uniform float shininess;
+uniform int shadingModel;   // 0 = Phong, 1 = Blinn-Phong
+
+varying vec3 N, L, E;
+
+void main()
+{
+    vec4 fColor;
+    vec4 ambient = ambientProduct;
+
+    // Normalized vectors
+    vec3 nN = normalize(N);
+    vec3 nL = normalize(L);
+    vec3 nE = normalize(E);
+
+    float Kd = max(dot(nL, nN), 0.0);
+    vec4 diffuse = Kd * diffuseProduct;
+
+    float Ks;
+    if (shadingModel == 1) {
+        // Blinn-Phong: use halfway vector
+        vec3 H = normalize(nL + nE);
+        Ks = pow(max(dot(nN, H), 0.0), shininess);
+    } else {
+        // Phong: use reflection vector
+        vec3 R = reflect(-nL, nN);
+        Ks = pow(max(dot(nE, R), 0.0), shininess);
+    }
+
+    vec4 specular = Ks * specularProduct;
+
+    // Avoid specular under backlight
+    if (dot(nL, nN) < 0.0) {
+        specular = vec4(0.0, 0.0, 0.0, 1.0);
+    }
+
+    fColor = ambient + diffuse + specular;
+    fColor.a = 1.0;
+    gl_FragColor = fColor;
+}
+</script>
+
+
+<script type="text/javascript" src="webgl-utils.js"></script>
+<script type="text/javascript" src="initShaders.js"></script>
+<script type="text/javascript" src="MV.js"></script>
+<script type="text/javascript" src="teapotData.js"></script>
+<script type="text/javascript" src="PhongTepottur.js"></script>
+
+<body>
+    <h3>Phong / Blinn-Phong skiptitakki</h3>
+    <button id="toggleShading">Skipta á milli Phong / Blinn-Phong</button>
+    <br><br>
+
+    <canvas id="gl-canvas" width="600" height="600"></canvas>
+</body>
+
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+
+<script id="vertex-shader" type="x-shader/x-vertex">
+attribute vec4 vPosition;
+attribute vec3 vNormal;
+varying vec3 N;   // normal in eye coords
+varying vec3 pos; // position in eye coords
+uniform mat4 modelViewMatrix;
+uniform mat4 projectionMatrix;
+uniform mat3 normalMatrix;
+
+void main()
+{
+    // position in eye coordinates
+    vec3 eyePos = (modelViewMatrix * vPosition).xyz;
+    pos = eyePos;
+
+    // transform normal to eye coordinates
+    N = normalize(normalMatrix * vNormal);
+
+    gl_Position = projectionMatrix * modelViewMatrix * vPosition;
+}
+</script>
+
+
+<script id="fragment-shader" type="x-shader/x-fragment">
+precision mediump float;
+
+uniform vec4 ambientProduct;
+uniform vec4 diffuseProduct;
+uniform vec4 specularProduct;
+uniform float shininess;
+uniform vec4 lightPosition; 
+varying vec3 N;
+varying vec3 pos;
+
+void main()
+{
+    vec4 ambient = ambientProduct;
+
+    // compute L (light direction) depending on directional/positional light
+    vec3 L;
+    if(lightPosition.w == 0.0) {
+        // directional light: direction is given by lightPosition.xyz
+        L = normalize(lightPosition.xyz);
+    } else {
+        // point light: vector from fragment position to light position
+        L = normalize(lightPosition.xyz - pos);
+    }
+
+    // view vector (from fragment toward eye at origin in eye coords)
+    vec3 E = normalize(-pos);
+
+    // normalize interpolated normal
+    vec3 NN = normalize(N);
+
+    // diffuse
+    float Kd = max(dot(NN, L), 0.0);
+    vec4 diffuse = Kd * diffuseProduct;
+
+    // Blinn-Phong specular with half-vector
+    vec3 H = normalize(L + E);
+    float specFactor = 0.0;
+    if (Kd > 0.0) {
+        specFactor = pow(max(dot(NN, H), 0.0), shininess);
+    }
+    vec4 specular = specFactor * specularProduct;
+
+    vec4 fColor = ambient + diffuse + specular;
+    fColor.a = 1.0;
+    gl_FragColor = fColor;
+}
+</script>
+
+
+<script type="text/javascript" src="webgl-utils.js"></script>
+<script type="text/javascript" src="initShaders.js"></script>
+<script type="text/javascript" src="MV.js"></script>
+<script type="text/javascript" src="PhongCube.js"></script>
+
+<body>
+    <td> <canvas id="gl-canvas" width="600" height="600">
+</body>
+</html>
