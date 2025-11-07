@@ -2,6 +2,14 @@
 function startEffect(canvas) {
 // spinny_orb.js
 
+  canvas.id = "effectCanvas";
+  canvas.style.position = "fixed";
+  canvas.style.inset = "0";
+  canvas.style.zIndex = "5"; 
+  canvas.style.pointerEvents = "none"; 
+  canvas.style.background = "transparent";
+
+
 // --- Utility functions ---
 function ok(t) { return { ok: true, data: t }; }
 function err(e) { return { ok: false, error: e }; }
