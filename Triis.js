@@ -376,21 +376,24 @@ function clearLayers() {
     if (score >= 100) {
       activateEffect();
     }
-    if (score >= 100 && !intenseMode) {
-      intenseMode = true;
-      if (musicEnabled) {
-        // Smooth transition
-        calmTrack.volume = 0.3;
-        const fade = setInterval(() => {
-          calmTrack.volume = 0;
-          if (calmTrack.volume <= 0) {
-            clearInterval(fade);
-            calmTrack.pause();
-            playTrack(intenseTrack);
-          }
-        }, 100);
+if (score >= 100 && !intenseMode) {
+  intenseMode = true;
+  if (musicEnabled) {
+    calmTrack.volume = 0.3;
+    const fade = setInterval(() => {
+      calmTrack.volume = Math.max(0, calmTrack.volume - 0.02);
+      if (calmTrack.volume <= 0.01) {
+        clearInterval(fade);
+        calmTrack.pause();
+        playTrack(intenseTrack);
       }
-    }
+    }, 150);
+  }
+  //Da ORB
+  const orbCanvas = document.createElement("canvas");
+  startEffect(orbCanvas);
+}
+
   }
 }
 
@@ -500,6 +503,12 @@ function resetGrid() {
 
 // Reset routine
 function resetGame() {
+
+    const orbCanvas = document.getElementById("effectCanvas");
+    if (orbCanvas) {
+        orbCanvas.remove(); 
+    }
+
   // Hide overlay & flags
   document.getElementById("gameover").style.display = "none";
   gameOver = false;
