@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<style type="text/css">
+    canvas { background: blue; }
+</style>
+
+
+<script id="vertex-shader" type="x-shader/x-vertex">
+
+attribute  vec4 vPosition;
+attribute  vec2 vTexCoord;
+
+varying vec2 fTexCoord;
+
+uniform mat4 projection;
+uniform mat4 modelview;
+
+void main()
+{
+    fTexCoord = vTexCoord;
+    gl_Position = projection * modelview * vPosition;
+}
+</script>
+
+<script id="fragment-shader" type="x-shader/x-fragment">
+
+precision mediump float;
+
+varying vec2 fTexCoord;
+uniform sampler2D texture;
+uniform vec3 colorAdjust;
+
+void main() {
+    vec4 texColor = texture2D(texture, fTexCoord);
+    gl_FragColor = vec4(texColor.rgb * colorAdjust, texColor.a);
+}
+
+</script>
+
+<script type="text/javascript" src="webgl-utils.js"></script>
+<script type="text/javascript" src="initShaders.js"></script>
+<script type="text/javascript" src="MV.js"></script>
+<script type="text/javascript" src="HIspjald.js"></script>
+
+
+<body>
+<canvas id="gl-canvas" width="600" height="600">
+<img id = "texImage" src = "HI_Logo.jpg" hidden></img>
+</body>
+</html>

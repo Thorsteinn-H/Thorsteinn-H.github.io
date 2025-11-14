@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="is">
+<head>
+  <meta charset="utf-8">
+  <title>Kúla og kleinuhringur</title>
+  <style>
+    body { margin: 0; overflow: hidden; }
+    canvas { display: block; }
+  </style>
+</head>
+<body>
+  <script src="three.js"></script>
+  <script src="OrbitControls.js"></script>
+  <script>
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x87ceeb);
+
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100);
+    camera.position.set(3, 2, 4);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+
+    // Gólfið
+    const floorGeo = new THREE.PlaneGeometry(10, 10);
+    const floorMat = new THREE.MeshPhongMaterial({ color: 0xcccccc });
+    const floor = new THREE.Mesh(floorGeo, floorMat);
+    floor.rotation.x = -Math.PI / 2;
+    floor.position.y = -1.5;
+    scene.add(floor);
+
+    // Kleinuhringur
+    const torusGeo = new THREE.TorusGeometry(1, 0.3, 16, 100);
+    const torusMat = new THREE.MeshPhongMaterial({ color: 0x8844aa });
+    const torus = new THREE.Mesh(torusGeo, torusMat);
+    torus.rotation.y = Math.PI / 2;     // stand up
+    torus.position.set(0, 0.5, 0);      // lift above floor
+    scene.add(torus);
+
+    // Kúla
+    const sphereGeo = new THREE.SphereGeometry(0.2, 32, 32);
+    const sphereMat = new THREE.MeshPhongMaterial({ color: 0xff8844 });
+    const sphere = new THREE.Mesh(sphereGeo, sphereMat);
+    scene.add(sphere);
+
+    // Lýsing
+    const light = new THREE.DirectionalLight(0xffffff, 1);
+    light.position.set(4, 5, 6);
+    scene.add(light);
+    scene.add(new THREE.AmbientLight(0x404040));
+
+   // --- Hreyfing ---
+   // Færa kúlu í kringum orbit sem hefur punkt í holu á kleinuhringum
+const majorRadius = torus.geometry.parameters.radius; // stórri hringur 
+const clock = new THREE.Clock();
+
+function animate() {
+  requestAnimationFrame(animate);
+  const t = clock.getElapsedTime();
+
+  const axis = new THREE.Vector3(0, 1, 0).applyQuaternion(torus.quaternion).normalize();
+
+  const up = Math.abs(axis.dot(new THREE.Vector3(0,1,0))) < 0.9 ? new THREE.Vector3(0,1,0) : new THREE.Vector3(1,0,0);
+
+  const a = new THREE.Vector3().crossVectors(axis, up).normalize();
+  const b = new THREE.Vector3().crossVectors(axis, a).normalize();
+
+  const r = majorRadius;
+  const x = Math.cos(t) * r + 1;
+  const y = Math.sin(t) * r;
+
+  const pos = new THREE.Vector3().copy(torus.position)
+                .add(a.multiplyScalar(x))
+                .add(b.multiplyScalar(y));
+
+  sphere.position.copy(pos);
+
+  controls.update();
+  renderer.render(scene, camera);
+}
+
+animate();
+
+
+    animate();
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
+</body>
+</html>
